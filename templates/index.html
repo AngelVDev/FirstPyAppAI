@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat App</title>
+</head>
+<body>
+    <h1>Chat App</h1>
+    
+    <form id="messageForm" action="/post_message" method="post">
+        <input type="text" name="prompt" placeholder="Enter your message" required>
+        <button type="submit">Send</button>
+    </form>
+    
+    <div id="chatHistory">
+        {% for entry in chat_history %}
+        {% endfor %}
+    </div>
+    
+    <script>
+        function fetchChatHistory() {
+            fetch('/get_chat_history')
+                .then(response => response.json())
+                .then(data => {
+                    const chatHistory = document.getElementById('chatHistory');
+                    chatHistory.innerHTML = '';
+                    
+                    data.forEach(entry => {
+                        const p = document.createElement('p');
+                        p.innerHTML = `The prompt was: "${entry.prompt}"`;
+                        const bot = document.createElement('p');
+                        chatHistory.appendChild(p);
+                        bot.innerHTML = `Bot said: ${entry.response}`;
+                        chatHistory.appendChild(bot);
+                    });
+                });
+        }
+        
+        // Fetch chat history immediately and then poll every 5 seconds
+        fetchChatHistory();
+        setInterval(fetchChatHistory, 1000);
+    </script>
+</body>
+</html>
